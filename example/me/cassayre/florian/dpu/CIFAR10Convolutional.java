@@ -2,12 +2,12 @@ package me.cassayre.florian.dpu;
 
 import me.cassayre.florian.dpu.layer.Layer;
 import me.cassayre.florian.dpu.network.Network;
-import me.cassayre.florian.dpu.network.trainer.StochasticTrainer;
+import me.cassayre.florian.dpu.network.trainer.AdadeltaTrainer;
 import me.cassayre.florian.dpu.network.trainer.Trainer;
-import me.cassayre.florian.dpu.util.volume.Dimensions;
-import me.cassayre.florian.dpu.util.volume.Volume;
 import me.cassayre.florian.dpu.util.cifar.CIFAR10TrainingImage;
 import me.cassayre.florian.dpu.util.cifar.CIFARReader;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class CIFAR10Convolutional
 
         // Mini-batch size: 1
         // Learning rate: 0.0001
-        final Trainer trainer = new StochasticTrainer(network, 1, 0.0001);
+        final Trainer trainer = new AdadeltaTrainer(network, 1, 0.0001);
 
         final List<CIFAR10TrainingImage> trainingSet = CIFARReader.readAllBatches();
         final List<CIFAR10TrainingImage> testingSet = CIFARReader.readTestBatch();

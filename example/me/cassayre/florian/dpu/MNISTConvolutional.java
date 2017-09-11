@@ -2,12 +2,12 @@ package me.cassayre.florian.dpu;
 
 import me.cassayre.florian.dpu.layer.Layer;
 import me.cassayre.florian.dpu.network.Network;
-import me.cassayre.florian.dpu.network.trainer.StochasticTrainer;
+import me.cassayre.florian.dpu.network.trainer.AdadeltaTrainer;
 import me.cassayre.florian.dpu.network.trainer.Trainer;
-import me.cassayre.florian.dpu.util.volume.Dimensions;
-import me.cassayre.florian.dpu.util.volume.Volume;
 import me.cassayre.florian.dpu.util.mnist.MNISTReader;
 import me.cassayre.florian.dpu.util.mnist.MNISTTrainingImage;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class MNISTConvolutional
 
         // Mini-batch size: 1
         // Learning rate: 0.001
-        final Trainer trainer = new StochasticTrainer(network, 1, 0.001);
+        final Trainer trainer = new AdadeltaTrainer(network, 0.95, 1E-6);
 
         final List<MNISTTrainingImage> images = MNISTReader.readTrainingImages();
         final List<Integer> labels = MNISTReader.readTrainingLabels();
