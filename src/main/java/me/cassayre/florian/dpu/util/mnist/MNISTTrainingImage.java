@@ -1,12 +1,12 @@
 package me.cassayre.florian.dpu.util.mnist;
 
-public final class TrainingImage
+public final class MNISTTrainingImage
 {
     public static final int SIZE = 28, LENGTH = SIZE * SIZE;
 
     private final byte[] data;
 
-    public TrainingImage(byte[] data)
+    public MNISTTrainingImage(byte[] data)
     {
         this.data = data; // Warning, no copy
     }
@@ -32,7 +32,7 @@ public final class TrainingImage
         return x >= 0 && y >= 0 && x < SIZE && y < SIZE;
     }
 
-    public TrainingImage translated(int rx, int ry)
+    public MNISTTrainingImage translated(int rx, int ry)
     {
         final byte[] array = new byte[LENGTH];
 
@@ -46,7 +46,7 @@ public final class TrainingImage
             }
         }
 
-        return new TrainingImage(array);
+        return new MNISTTrainingImage(array);
     }
 
     @Override

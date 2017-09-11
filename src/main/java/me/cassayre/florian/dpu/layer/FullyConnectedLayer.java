@@ -1,5 +1,8 @@
 package me.cassayre.florian.dpu.layer;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import me.cassayre.florian.dpu.util.Dimensions;
 import me.cassayre.florian.dpu.util.Volume;
 
@@ -65,5 +68,54 @@ public class FullyConnectedLayer extends Layer
         array[array.length - 1] = biases;
 
         return array;
+    }
+
+    @Override
+    public JsonObject export()
+    {
+        final JsonObject object = new JsonObject();
+        final JsonArray array = new JsonArray();
+
+
+        for(int j = 0; j < weights.length; j++)
+        {
+            final JsonObject f = new JsonObject();
+            final JsonObject w = new JsonObject();
+
+            int i = 0;
+
+            for(int y = 0; y < weights[0].getHeight(); y++)
+            {
+                for(int x = 0; x < weights[0].getWidth(); x++)
+                {
+
+                    for(int z = 0; z < weights[0].getDepth(); z++)
+                    {
+                        final Volume weight = weights[j];
+                        w.add(i + "", new JsonPrimitive(weight.get(x, y, z)));
+                        i++;
+                    }
+                }
+            }
+
+            f.add("w", w);
+            array.add(f);
+        }
+
+
+        object.add("filters", array);
+
+        final JsonObject b = new JsonObject();
+        final JsonObject w2 = new JsonObject();
+
+        for(int j = 0; j < biases.getDepth(); j++)
+        {
+            w2.add(j + "", new JsonPrimitive(biases.get(0, 0, j)));
+        }
+
+        b.add("w", w2);
+        object.add("biases", b);
+
+        return object;
     }
 }

@@ -14,6 +14,13 @@ public final class Volume
         this.gradient = new double[dimensions.getWidth()][dimensions.getHeight()][dimensions.getDepth()];
     }
 
+    private Volume(Dimensions dimensions, double[][][] values, double[][][] gradient)
+    {
+        this.dimensions = dimensions;
+        this.values = values;
+        this.gradient = gradient;
+    }
+
     public Dimensions getDimensions()
     {
         return dimensions;
@@ -96,5 +103,20 @@ public final class Volume
     public void fillGradientsRelative(TriFunction<Integer, Integer, Integer, Double> function)
     {
         foreach((x, y, z) -> addGradient(x, y, z, function.apply(x, y, z)));
+    }
+
+    @Override
+    public Volume clone()
+    {
+        double[][][] values = new double[dimensions.getWidth()][dimensions.getHeight()][dimensions.getDepth()];
+        double[][][] gradient = new double[dimensions.getWidth()][dimensions.getHeight()][dimensions.getDepth()];
+
+        foreach((x, y, z) ->
+        {
+            values[x][y][z] = this.values[x][y][z];
+            gradient[x][y][z] = this.gradient[x][y][z];
+        });
+
+        return new Volume(dimensions, values, gradient);
     }
 }

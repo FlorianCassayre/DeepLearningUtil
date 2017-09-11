@@ -1,5 +1,8 @@
 package me.cassayre.florian.dpu.layer;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import me.cassayre.florian.dpu.util.Dimensions;
 import me.cassayre.florian.dpu.util.Volume;
 
@@ -8,9 +11,9 @@ public class ConvolutionLayer extends Layer
     protected final Volume[] filters;
     protected final Volume biases;
 
-    public ConvolutionLayer(Dimensions imageDimensions, Volume[] filters, Volume biases)
+    public ConvolutionLayer(Dimensions imageDimensions, Volume[] filters, Volume biases) // filter: (width, height, previous_depth)[next_depth]
     {
-        super(new Dimensions(imageDimensions.getWidth(), imageDimensions.getHeight(), filters[0].getDepth()));
+        super(new Dimensions(imageDimensions.getWidth(), imageDimensions.getHeight(), filters.length));
 
         if(filters[0].getWidth() % 2 == 0 || filters[0].getHeight() % 2 == 0)
             throw new IllegalArgumentException("Filter dimensions must be odd");
@@ -22,7 +25,7 @@ public class ConvolutionLayer extends Layer
     @Override
     public Dimensions getInputDimensions()
     {
-        return new Dimensions(volume.getWidth(), volume.getHeight(), filters.length);
+        return new Dimensions(volume.getWidth(), volume.getHeight(), filters[0].getDepth());
     }
 
     @Override
@@ -30,27 +33,27 @@ public class ConvolutionLayer extends Layer
     {
         for(int i = 0; i < volume.getDepth(); i++)
         {
-            final double bias = biases.get(0, 0, i);
+            final Volume filter = this.filters[i];
 
             for(int x = 0; x < volume.getWidth(); x++)
             {
                 for(int y = 0; y < volume.getHeight(); y++)
                 {
-                    double sum = bias;
+                    double sum = biases.get(0, 0, i);
 
                     final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
 
-                    for(int j = 0; j < filters.length; j++)
+                    for(int x1 = -rx; x1 <= rx; x1++)
                     {
-                        final Volume filter = filters[j];
-                        for(int x1 = -rx; x1 <= rx; x1++)
+                        for(int y1 = -ry; y1 <= ry; y1++)
                         {
-                            for(int y1 = -ry; y1 <= ry; y1++)
+                            final int xf = x + x1, yf = y + y1;
+
+                            if(isInBounds(xf, yf))
                             {
-                                final int xf = x + x1, yf = y + y1;
-                                if(isInBounds(xf, yf))
+                                for(int j = 0; j < filter.getDepth(); j++)
                                 {
-                                    sum += input.get(xf, yf, j) * filter.get(x1 + rx, y1 + rx, i);
+                                    sum += input.get(xf, yf, j) * filter.get(x1 + rx, y1 + rx, j);
                                 }
                             }
                         }
@@ -72,7 +75,7 @@ public class ConvolutionLayer extends Layer
     {
         input.fillGradients((x, y, z) -> 0.0);
 
-        for(int i = 0; i < filters.length; i++)
+        for(int i = 0; i < volume.getDepth(); i++)
         {
             final Volume filter = filters[i];
 
@@ -84,17 +87,18 @@ public class ConvolutionLayer extends Layer
 
                     final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
 
-                    for(int j = 0; j < volume.getDepth(); j++)
+                    for(int x1 = -rx; x1 <= rx; x1++)
                     {
-                        for(int x1 = -rx; x1 <= rx; x1++)
+                        for(int y1 = -ry; y1 <= ry; y1++)
                         {
-                            for(int y1 = -ry; y1 <= ry; y1++)
+                            final int xf = x + x1, yf = y + y1;
+
+                            if(isInBounds(xf, yf))
                             {
-                                final int xf = x + x1, yf = y + y1;
-                                if(isInBounds(xf, yf))
+                                for(int j = 0; j < filter.getDepth(); j++)
                                 {
-                                    filter.addGradient(x1 + rx, y1 + ry, j, input.get(xf, yf, i) * chain);
-                                    input.addGradient(xf, yf, i, filter.get(x1 + rx, y1 + ry, j) * chain);
+                                    filter.addGradient(x1 + rx, y1 + ry, j, input.get(xf, yf, j) * chain);
+                                    input.addGradient(xf, yf, j, filter.get(x1 + rx, y1 + ry, j) * chain);
                                 }
                             }
                         }
@@ -114,5 +118,49 @@ public class ConvolutionLayer extends Layer
         array[array.length - 1] = biases;
 
         return array;
+    }
+
+    @Override
+    public JsonObject export()
+    {
+        final JsonObject object = new JsonObject();
+        final JsonArray array = new JsonArray();
+
+        for(Volume filter : filters)
+        {
+            final JsonObject f = new JsonObject();
+            final JsonObject w = new JsonObject();
+
+            int i = 0;
+            for(int y = 0; y < filter.getHeight(); y++)
+            {
+                for(int x = 0; x < filter.getWidth(); x++)
+                {
+                    for(int z = 0; z < filter.getDepth(); z++)
+                    {
+                        w.add(i + "", new JsonPrimitive(filter.get(x, y, z)));
+                        i++;
+                    }
+                }
+            }
+
+            f.add("w", w);
+            array.add(f);
+        }
+
+        object.add("filters", array);
+
+        final JsonObject b = new JsonObject();
+        final JsonObject w = new JsonObject();
+
+        for(int i = 0; i < biases.getDepth(); i++)
+        {
+            w.add(i + "", new JsonPrimitive(biases.get(0, 0, i)));
+        }
+
+        b.add("w", w);
+        object.add("biases", b);
+
+        return object;
     }
 }

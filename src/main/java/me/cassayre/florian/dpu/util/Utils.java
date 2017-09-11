@@ -1,6 +1,6 @@
 package me.cassayre.florian.dpu.util;
 
-import me.cassayre.florian.dpu.util.mnist.TrainingImage;
+import me.cassayre.florian.dpu.util.mnist.MNISTTrainingImage;
 
 public final class Utils
 {
@@ -15,7 +15,7 @@ public final class Utils
     public static Volume randomWeightsVolume(Dimensions dimensions)
     {
         final Volume volume = new Volume(dimensions);
-        volume.fillValues((x, y, z) -> Math.random() * 2 - 1);
+        volume.fillValues((x, y, z) -> (Math.random() - 0.5) * 2);
         return volume;
     }
 
@@ -39,7 +39,8 @@ public final class Utils
         return randomWeightsVolumeArray(new Dimensions(width, height, depth), n);
     }
 
-    public static Volume imageTo24Volume(TrainingImage image)
+    @Deprecated
+    public static Volume imageTo24Volume(MNISTTrainingImage image)
     {
         final Volume volume = new Volume(new Dimensions(24, 24, 1));
 
@@ -47,13 +48,14 @@ public final class Utils
         {
             for(int y = 0; y < volume.getHeight(); y++)
             {
-                volume.set(x, y, 0, image.pixelAt(x + 2, y + 2) != 0 ? 1.0 : 0.0);
+                volume.set(x, y, 0, image.pixelAt(x + 2, y + 2) / 255.0);
             }
         }
 
         return volume;
     }
 
+    @Deprecated
     public static int getMNISTActivation(Volume output)
     {
         int k = -1;

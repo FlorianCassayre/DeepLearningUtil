@@ -18,7 +18,7 @@ public interface MNISTReader
     static String TEST_IMAGES_FILE_NAME = "t10k-images.idx3-ubyte";
     static String TEST_LABELS_FILE_NAME = "t10k-labels.idx1-ubyte";
 
-    static List<TrainingImage> readImages(String fileName) throws IOException
+    static List<MNISTTrainingImage> readImages(String fileName) throws IOException
     {
         final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(fileName)));
 
@@ -28,18 +28,18 @@ public interface MNISTReader
         final int count = in.readInt();
         final int rows = in.readInt(), columns = in.readInt();
 
-        if(rows != TrainingImage.SIZE || columns != TrainingImage.SIZE)
+        if(rows != MNISTTrainingImage.SIZE || columns != MNISTTrainingImage.SIZE)
             throw new IllegalStateException();
 
-        final List<TrainingImage> list = new ArrayList<>(count);
+        final List<MNISTTrainingImage> list = new ArrayList<>(count);
 
         for(int i = 0; i < count; i++)
         {
-            final byte[] array = new byte[TrainingImage.SIZE * TrainingImage.SIZE];
+            final byte[] array = new byte[MNISTTrainingImage.SIZE * MNISTTrainingImage.SIZE];
 
             in.read(array);
 
-            list.add(new TrainingImage(array));
+            list.add(new MNISTTrainingImage(array));
         }
 
         return list;
@@ -64,7 +64,7 @@ public interface MNISTReader
         return list;
     }
 
-    static List<TrainingImage> readTrainingImages() throws IOException
+    static List<MNISTTrainingImage> readTrainingImages() throws IOException
     {
         return readImages(TRAINING_IMAGES_FILE_NAME);
     }
@@ -74,7 +74,7 @@ public interface MNISTReader
         return readLabels(TRAINING_LABELS_FILE_NAME);
     }
 
-    static List<TrainingImage> readTestImages() throws IOException
+    static List<MNISTTrainingImage> readTestImages() throws IOException
     {
         return readImages(TEST_IMAGES_FILE_NAME);
     }
