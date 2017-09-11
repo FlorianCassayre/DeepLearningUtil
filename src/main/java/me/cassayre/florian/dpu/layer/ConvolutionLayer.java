@@ -3,8 +3,8 @@ package me.cassayre.florian.dpu.layer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import me.cassayre.florian.dpu.util.Dimensions;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
 
 public class ConvolutionLayer extends Layer
 {

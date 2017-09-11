@@ -1,4 +1,4 @@
-package me.cassayre.florian.dpu.util;
+package me.cassayre.florian.dpu.util.volume;
 
 import java.util.Objects;
 
@@ -39,6 +39,11 @@ public final class Dimensions
     public int getDepth()
     {
         return depth;
+    }
+
+    public int getSize()
+    {
+        return width * height * depth;
     }
 
     @Override

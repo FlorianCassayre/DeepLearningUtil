@@ -1,9 +1,9 @@
 package me.cassayre.florian.dpu.network;
 
 import me.cassayre.florian.dpu.layer.*;
-import me.cassayre.florian.dpu.util.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
 import me.cassayre.florian.dpu.util.Utils;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Volume;
 
 import java.util.ArrayList;
 import java.util.List;

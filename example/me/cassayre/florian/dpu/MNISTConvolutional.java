@@ -4,8 +4,8 @@ import me.cassayre.florian.dpu.layer.Layer;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.network.trainer.StochasticTrainer;
 import me.cassayre.florian.dpu.network.trainer.Trainer;
-import me.cassayre.florian.dpu.util.Dimensions;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
 import me.cassayre.florian.dpu.util.mnist.MNISTReader;
 import me.cassayre.florian.dpu.util.mnist.MNISTTrainingImage;
 

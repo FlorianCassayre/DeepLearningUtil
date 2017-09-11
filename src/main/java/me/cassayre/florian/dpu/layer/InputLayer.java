@@ -1,7 +1,9 @@
 package me.cassayre.florian.dpu.layer;
 
-import me.cassayre.florian.dpu.util.Dimensions;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
+
+import java.util.function.Function;
 
 public class InputLayer extends Layer
 {
@@ -19,7 +21,7 @@ public class InputLayer extends Layer
     @Override
     public void forwardPropagation(Volume input)
     {
-        volume.fillValues(input::get);
+        volume.fillValues((Function<Integer, Double>) input::get);
     }
 
     @Override

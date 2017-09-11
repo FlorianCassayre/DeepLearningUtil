@@ -1,8 +1,8 @@
 package me.cassayre.florian.dpu.network.trainer;
 
 import me.cassayre.florian.dpu.network.Network;
-import me.cassayre.florian.dpu.util.Dimensions;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
 
 public class AdadeltaTrainer extends Trainer
 {
@@ -55,7 +55,7 @@ public class AdadeltaTrainer extends Trainer
 
                 weightVolume.foreach((x, y, z) ->
                 {
-                    final double grad = weightVolume.getGradient(x, y, z);
+                    final double grad = weightVolume.getGradient(x, y, z) / batchSize;
 
                     final Volume gt1 = gt[i1][j1], vt1 = vt[i1][j1], xt1 = xt[i1][j1];
 

@@ -1,7 +1,9 @@
 package me.cassayre.florian.dpu.layer;
 
-import me.cassayre.florian.dpu.util.Dimensions;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
+
+import java.util.function.Function;
 
 public class SoftmaxLayer extends OutputLayer
 {
@@ -62,7 +64,7 @@ public class SoftmaxLayer extends OutputLayer
     @Override
     public void backwardPropagation(Volume input)
     {
-        input.fillGradients(volume::getGradient);
+        input.fillGradients((Function<Integer, Double>) volume::getGradient);
     }
 
     @Override

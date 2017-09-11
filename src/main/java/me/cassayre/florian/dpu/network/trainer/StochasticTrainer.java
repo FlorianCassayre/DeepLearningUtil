@@ -2,7 +2,7 @@ package me.cassayre.florian.dpu.network.trainer;
 
 import me.cassayre.florian.dpu.layer.Layer;
 import me.cassayre.florian.dpu.network.Network;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Volume;
 
 public class StochasticTrainer extends Trainer
 {

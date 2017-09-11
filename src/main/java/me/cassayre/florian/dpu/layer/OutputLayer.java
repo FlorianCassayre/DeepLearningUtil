@@ -1,7 +1,7 @@
 package me.cassayre.florian.dpu.layer;
 
-import me.cassayre.florian.dpu.util.Dimensions;
-import me.cassayre.florian.dpu.util.Volume;
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
 
 public abstract class OutputLayer extends Layer
 {
