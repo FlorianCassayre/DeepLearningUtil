@@ -174,6 +174,30 @@ public class Network
             return this;
         }
 
+        public Builder reshape(Dimensions newDimensions)
+        {
+            checkBuilt();
+
+            final ReshapeLayer layer = new ReshapeLayer(previous.getOutputDimensions(), newDimensions);
+
+            hiddenLayers.add(layer);
+            previous = layer;
+
+            return this;
+        }
+
+        public Builder hookUpSample(int stride)
+        {
+            checkBuilt();
+
+            final UpSampleLayer layer = new UpSampleLayer(previous.getOutputDimensions(), stride);
+
+            hiddenLayers.add(layer);
+            previous = layer;
+
+            return this;
+        }
+
         public Network build(Layer.OutputFunctionType outputFunctionType)
         {
             checkBuilt();

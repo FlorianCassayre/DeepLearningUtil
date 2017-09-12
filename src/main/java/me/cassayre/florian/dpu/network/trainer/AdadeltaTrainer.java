@@ -10,7 +10,7 @@ public class AdadeltaTrainer extends Trainer
 
     private Volume[][] gt, vt, xt;
 
-    public AdadeltaTrainer(Network network, double gamma, double e)
+    public AdadeltaTrainer(Network network, int batchSize, double gamma, double e)
     {
         super(network);
 
@@ -38,6 +38,11 @@ public class AdadeltaTrainer extends Trainer
                 xt[i][j] = new Volume(dimensions);
             }
         }
+    }
+
+    public AdadeltaTrainer(Network network, double gamma, double e)
+    {
+        this(network, 1, gamma, e);
     }
 
     @Override
