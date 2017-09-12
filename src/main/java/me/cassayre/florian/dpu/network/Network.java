@@ -115,17 +115,35 @@ public class Network
             return hookFullyConnected(Utils.randomWeightsVolumeArray(previous.getOutputDimensions(), dimensions.getDepth()), Utils.randomWeightsVolume(dimensions), functionType);
         }
 
-        public Builder hookConvolutionLayer(Volume[] filters, Volume biases, int poolingStride, Layer.ActivationFunctionType functionType)
+        public Builder hookConvolutionLayer(Volume[] filters, Volume biases, int convolutionStride, int convolutionPadding, int poolingStride, Layer.ActivationFunctionType functionType)
         {
             checkBuilt();
 
-            final ConvolutionLayer layer = new ConvolutionLayer(previous.getOutputDimensions(), filters, biases);
+            final ConvolutionLayer layer = new ConvolutionLayer(previous.getOutputDimensions(), filters, biases, convolutionStride, convolutionStride, convolutionPadding, convolutionPadding);
 
             hiddenLayers.add(layer);
-
             previous = layer;
 
             hookActivationFunction(functionType);
+
+            maxPool(poolingStride);
+
+            return this;
+        }
+
+        public Builder hookConvolutionLayer(Dimensions filterDimensions, int convolutionStride, int convolutionPadding, int poolingStride, Layer.ActivationFunctionType functionType)
+        {
+            return hookConvolutionLayer(Utils.randomWeightsVolumeArray(new Dimensions(filterDimensions.getWidth(), filterDimensions.getHeight(), previous.getOutput().getDepth()), filterDimensions.getDepth()), Utils.randomWeightsVolume(1, 1, filterDimensions.getDepth()), convolutionStride, convolutionPadding, poolingStride, functionType);
+        }
+
+        public Builder hookConvolutionLayer(Dimensions filterDimensions, int poolingStride, Layer.ActivationFunctionType functionType)
+        {
+            return hookConvolutionLayer(Utils.randomWeightsVolumeArray(new Dimensions(filterDimensions.getWidth(), filterDimensions.getHeight(), previous.getOutput().getDepth()), filterDimensions.getDepth()), Utils.randomWeightsVolume(1, 1, filterDimensions.getDepth()), 1, filterDimensions.getWidth() >> 1, poolingStride, functionType);
+        }
+
+        public Builder maxPool(int poolingStride)
+        {
+            checkBuilt();
 
             if(poolingStride > 1)
             {
@@ -136,11 +154,6 @@ public class Network
             }
 
             return this;
-        }
-
-        public Builder hookConvolutionLayer(Dimensions filterDimensions, int poolingStride, Layer.ActivationFunctionType functionType)
-        {
-            return hookConvolutionLayer(Utils.randomWeightsVolumeArray(new Dimensions(filterDimensions.getWidth(), filterDimensions.getHeight(), previous.getOutput().getDepth()), filterDimensions.getDepth()), Utils.randomWeightsVolume(1, 1, filterDimensions.getDepth()), poolingStride, functionType);
         }
 
         public Builder hookActivationFunction(Layer.ActivationFunctionType functionType)
@@ -179,6 +192,18 @@ public class Network
             checkBuilt();
 
             final ReshapeLayer layer = new ReshapeLayer(previous.getOutputDimensions(), newDimensions);
+
+            hiddenLayers.add(layer);
+            previous = layer;
+
+            return this;
+        }
+
+        public Builder pad(int preX, int subX, int preY, int subY)
+        {
+            checkBuilt();
+
+            final PaddingLayer layer = new PaddingLayer(previous.getOutputDimensions(), preX, subX, preY, subY);
 
             hiddenLayers.add(layer);
             previous = layer;
