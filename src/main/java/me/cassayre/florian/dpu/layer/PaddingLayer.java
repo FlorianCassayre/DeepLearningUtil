@@ -40,6 +40,7 @@ public class PaddingLayer extends Layer
     @Override
     public void backwardPropagation(Volume input)
     {
+        // Not working properly
         volume.fillGradients((x, y, z) ->
         {
             if(isInBounds(x - padX, y - padY))

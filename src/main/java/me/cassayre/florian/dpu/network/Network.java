@@ -141,6 +141,32 @@ public class Network
             return hookConvolutionLayer(Utils.randomWeightsVolumeArray(new Dimensions(filterDimensions.getWidth(), filterDimensions.getHeight(), previous.getOutput().getDepth()), filterDimensions.getDepth()), Utils.randomWeightsVolume(1, 1, filterDimensions.getDepth()), 1, filterDimensions.getWidth() >> 1, poolingStride, functionType);
         }
 
+        public Builder hookDeconvolutionLayer(Volume[] filters, Volume biases, int convolutionStride, int convolutionPadding, int poolingStride, Layer.ActivationFunctionType functionType)
+        {
+            checkBuilt();
+
+            final DeconvolutionLayer layer = new DeconvolutionLayer(previous.getOutputDimensions(), filters, biases, convolutionStride, convolutionStride, convolutionPadding, convolutionPadding);
+
+            hiddenLayers.add(layer);
+            previous = layer;
+
+            hookActivationFunction(functionType);
+
+            hookUpSample(poolingStride);
+
+            return this;
+        }
+
+        public Builder hookDeconvolutionLayer(Dimensions filterDimensions, int convolutionStride, int convolutionPadding, int poolingStride, Layer.ActivationFunctionType functionType)
+        {
+            return hookDeconvolutionLayer(Utils.randomWeightsVolumeArray(new Dimensions(filterDimensions.getWidth(), filterDimensions.getHeight(), previous.getOutput().getDepth()), filterDimensions.getDepth()), Utils.randomWeightsVolume(1, 1, filterDimensions.getDepth()), convolutionStride, convolutionPadding, poolingStride, functionType);
+        }
+
+        public Builder hookDeconvolutionLayer(Dimensions filterDimensions, int poolingStride, Layer.ActivationFunctionType functionType)
+        {
+            return hookDeconvolutionLayer(Utils.randomWeightsVolumeArray(new Dimensions(filterDimensions.getWidth(), filterDimensions.getHeight(), previous.getOutput().getDepth()), filterDimensions.getDepth()), Utils.randomWeightsVolume(1, 1, filterDimensions.getDepth()), 1, filterDimensions.getWidth() >> 1, poolingStride, functionType);
+        }
+
         public Builder maxPool(int poolingStride)
         {
             checkBuilt();

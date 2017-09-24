@@ -3,6 +3,9 @@ package me.cassayre.florian.dpu.util.volume;
 import me.cassayre.florian.dpu.util.TriConsumer;
 import me.cassayre.florian.dpu.util.TriFunction;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -192,5 +195,40 @@ public final class Volume
         });
 
         return new Volume(dimensions, values, gradient);
+    }
+
+    @Override
+    public String toString()
+    {
+        final String open = "[", close = "]", comma = ",";
+        final NumberFormat nf = NumberFormat.getNumberInstance(Locale.US);
+        final DecimalFormat formatter = (DecimalFormat) nf;
+        formatter.applyPattern("#0.000");
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append(open);
+        for(int z = 0; z < getDepth(); z++)
+        {
+            builder.append(open);
+            for(int y = 0; y < getHeight(); y++)
+            {
+                builder.append(open);
+                for(int x = 0; x < getWidth(); x++)
+                {
+                    builder.append(formatter.format(get(x, y, z)));
+                    if(x < getWidth() - 1)
+                        builder.append(comma);
+                }
+                builder.append(close);
+                if(y < getHeight() - 1)
+                    builder.append(comma);
+            }
+            builder.append(close);
+            if(z < getDepth() - 1)
+                builder.append(comma);
+        }
+        builder.append(close);
+
+        return builder.toString();
     }
 }

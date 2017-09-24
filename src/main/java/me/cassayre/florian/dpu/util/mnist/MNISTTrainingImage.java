@@ -1,5 +1,8 @@
 package me.cassayre.florian.dpu.util.mnist;
 
+import me.cassayre.florian.dpu.util.volume.Dimensions;
+import me.cassayre.florian.dpu.util.volume.Volume;
+
 public final class MNISTTrainingImage
 {
     public static final int SIZE = 28, LENGTH = SIZE * SIZE;
@@ -9,6 +12,24 @@ public final class MNISTTrainingImage
     public MNISTTrainingImage(byte[] data)
     {
         this.data = data; // Warning, no copy
+    }
+
+    public Volume imageToVolume()
+    {
+        final Volume volume = new Volume(new Dimensions(SIZE, SIZE, 1));
+
+        int i = 0;
+        for(int y = 0; y < SIZE; y++)
+        {
+            for(int x = 0; x < SIZE; x++)
+            {
+                volume.set(x, y, 0, (data[i] & 0xff) / 255.0);
+
+                i++;
+            }
+        }
+
+        return volume;
     }
 
     public int pixelAt(int i)
