@@ -1,5 +1,6 @@
 package me.cassayre.florian.dpu.network.trainer;
 
+import me.cassayre.florian.dpu.network.LayerParameters;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.util.volume.Dimensions;
 import me.cassayre.florian.dpu.util.volume.Volume;
@@ -17,13 +18,13 @@ public class AdadeltaTrainer extends Trainer
         this.gamma = gamma;
         this.e = e;
 
-        gt = new Volume[network.layers.size()][];
-        vt = new Volume[network.layers.size()][];
-        xt = new Volume[network.layers.size()][];
+        gt = new Volume[network.getLayers().size()][];
+        vt = new Volume[network.getLayers().size()][];
+        xt = new Volume[network.getLayers().size()][];
 
-        for(int i = 0; i < network.layers.size(); i++)
+        for(int i = 0; i < network.getLayers().size(); i++)
         {
-            final Volume[] weights = network.layers.get(i).getWeights();
+            final Volume[] weights = network.getLayers().get(i).getWeights();
 
             gt[i] = new Volume[weights.length];
             vt[i] = new Volume[weights.length];
@@ -48,10 +49,14 @@ public class AdadeltaTrainer extends Trainer
     @Override
     protected void updateWeights()
     {
-        for(int i = 0; i < network.layers.size(); i++)
+        for(int i = 0; i < network.getLayers().size(); i++)
         {
+            final LayerParameters parameters = network.getParameters().get(i);
             final int i1 = i;
-            final Volume[] weights = network.layers.get(i).getWeights();
+            final Volume[] weights = network.getLayers().get(i).getWeights();
+
+            if(!parameters.isTrainable())
+                continue;
 
             for(int j = 0; j < weights.length; j++)
             {

@@ -47,7 +47,7 @@ public abstract class Trainer
         {
             updateWeights();
 
-            for(Layer layer : network.layers)
+            for(Layer layer : network.getLayers())
                 for(final Volume weightVolume : layer.getWeights())
                     weightVolume.fillGradients((x, y, z) -> 0.0);
         }

@@ -6,19 +6,21 @@ import me.cassayre.florian.dpu.util.Utils;
 import me.cassayre.florian.dpu.util.volume.Volume;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Network
 {
-    public final List<Layer> layers;
+    private final List<Layer> layers;
+    private final List<LayerParameters> parameters;
 
-    public Network(InputLayer inputLayer, List<Layer> hiddenLayers, OutputLayer outputLayer)
+    public Network(InputLayer inputLayer, List<Layer> hiddenLayers, OutputLayer outputLayer, List<LayerParameters> parameters)
     {
-        this.layers = new ArrayList<>(hiddenLayers.size() + 2);
+        final List<Layer> layers = new ArrayList<>(hiddenLayers.size() + 2);
 
-        this.layers.add(inputLayer);
-        this.layers.addAll(hiddenLayers);
-        this.layers.add(outputLayer);
+        layers.add(inputLayer);
+        layers.addAll(hiddenLayers);
+        layers.add(outputLayer);
 
         Dimensions previous = inputLayer.getOutputDimensions();
         for(int i = 1; i < layers.size(); i++)
@@ -30,6 +32,13 @@ public class Network
 
             previous = layer.getOutputDimensions();
         }
+
+        this.layers = Collections.unmodifiableList(layers);
+
+        if(parameters.size() != layers.size())
+            throw new IllegalArgumentException("Parameters don't match one by one to their corresponding layer");
+
+        this.parameters = Collections.unmodifiableList(new ArrayList<>(parameters));
     }
 
     public void forwardPropagation(Volume input)
@@ -65,6 +74,16 @@ public class Network
         return ((OutputLayer) layers.get(layers.size() - 1)).getLoss();
     }
 
+    public List<Layer> getLayers()
+    {
+        return layers;
+    }
+
+    public List<LayerParameters> getParameters()
+    {
+        return parameters;
+    }
+
     @Deprecated
     public void clearGradients()
     {
@@ -85,22 +104,24 @@ public class Network
 
         private Layer previous;
 
+        private final List<LayerParameters> parameters = new ArrayList<>();
+        private boolean isTrainable;
+
         private boolean isBuilt = false;
 
         public Builder(Dimensions inputDimensions)
         {
             inputLayer = new InputLayer(inputDimensions);
             previous = inputLayer;
+
+            setDefaultParameters();
         }
 
         public Builder hookFullyConnected(Volume[] weights, Volume biases, Layer.ActivationFunctionType functionType)
         {
             checkBuilt();
 
-            final FullyConnectedLayer layer = new FullyConnectedLayer(weights, biases);
-            hiddenLayers.add(layer);
-
-            previous = layer;
+            hookLayer(new FullyConnectedLayer(weights, biases));
 
             hookActivationFunction(functionType);
 
@@ -119,10 +140,7 @@ public class Network
         {
             checkBuilt();
 
-            final ConvolutionLayer layer = new ConvolutionLayer(previous.getOutputDimensions(), filters, biases, convolutionStride, convolutionStride, convolutionPadding, convolutionPadding);
-
-            hiddenLayers.add(layer);
-            previous = layer;
+            hookLayer(new ConvolutionLayer(previous.getOutputDimensions(), filters, biases, convolutionStride, convolutionStride, convolutionPadding, convolutionPadding));
 
             hookActivationFunction(functionType);
 
@@ -145,10 +163,7 @@ public class Network
         {
             checkBuilt();
 
-            final DeconvolutionLayer layer = new DeconvolutionLayer(previous.getOutputDimensions(), filters, biases, convolutionStride, convolutionStride, convolutionPadding, convolutionPadding);
-
-            hiddenLayers.add(layer);
-            previous = layer;
+            hookLayer(new DeconvolutionLayer(previous.getOutputDimensions(), filters, biases, convolutionStride, convolutionStride, convolutionPadding, convolutionPadding));
 
             hookActivationFunction(functionType);
 
@@ -173,10 +188,7 @@ public class Network
 
             if(poolingStride > 1)
             {
-                final MaxPoolingLayer poolingLayer = new MaxPoolingLayer(previous.getOutputDimensions(), poolingStride);
-                hiddenLayers.add(poolingLayer);
-
-                previous = poolingLayer;
+                hookLayer(new MaxPoolingLayer(previous.getOutputDimensions(), poolingStride));
             }
 
             return this;
@@ -206,8 +218,7 @@ public class Network
                     throw new UnsupportedOperationException();
                 }
 
-                hiddenLayers.add(function);
-                previous = function;
+                hookLayer(function);
             }
 
             return this;
@@ -217,10 +228,7 @@ public class Network
         {
             checkBuilt();
 
-            final ReshapeLayer layer = new ReshapeLayer(previous.getOutputDimensions(), newDimensions);
-
-            hiddenLayers.add(layer);
-            previous = layer;
+            hookLayer(new ReshapeLayer(previous.getOutputDimensions(), newDimensions));
 
             return this;
         }
@@ -229,10 +237,7 @@ public class Network
         {
             checkBuilt();
 
-            final PaddingLayer layer = new PaddingLayer(previous.getOutputDimensions(), preX, subX, preY, subY);
-
-            hiddenLayers.add(layer);
-            previous = layer;
+            hookLayer(new PaddingLayer(previous.getOutputDimensions(), preX, subX, preY, subY));
 
             return this;
         }
@@ -241,10 +246,7 @@ public class Network
         {
             checkBuilt();
 
-            final UpSampleLayer layer = new UpSampleLayer(previous.getOutputDimensions(), stride);
-
-            hiddenLayers.add(layer);
-            previous = layer;
+            hookLayer(new UpSampleLayer(previous.getOutputDimensions(), stride));
 
             return this;
         }
@@ -253,12 +255,35 @@ public class Network
         {
             checkBuilt();
 
-            final BilinearResample layer = new BilinearResample(previous.getOutputDimensions(), newDimensions);
+            hookLayer(new BilinearResample(previous.getOutputDimensions(), newDimensions));
 
+            return this;
+        }
+
+        public Builder setTrainable(boolean trainable)
+        {
+            isTrainable = trainable;
+
+            return this;
+        }
+
+        public void hookLayer(Layer layer)
+        {
             hiddenLayers.add(layer);
             previous = layer;
 
-            return this;
+            pushParameters();
+        }
+
+        private void pushParameters()
+        {
+            parameters.add(new LayerParameters(isTrainable));
+            setDefaultParameters();
+        }
+
+        private void setDefaultParameters()
+        {
+            isTrainable = true;
         }
 
         public Network build(Layer.OutputFunctionType outputFunctionType)
@@ -278,9 +303,13 @@ public class Network
                 throw new UnsupportedOperationException();
             }
 
+            pushParameters();
+
+            pushParameters(); // Output layer
+
             isBuilt = true;
 
-            return new Network(inputLayer, hiddenLayers, outputLayer);
+            return new Network(inputLayer, hiddenLayers, outputLayer, parameters);
         }
 
         private void checkBuilt()

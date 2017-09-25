@@ -1,6 +1,7 @@
 package me.cassayre.florian.dpu.network.trainer;
 
 import me.cassayre.florian.dpu.layer.Layer;
+import me.cassayre.florian.dpu.network.LayerParameters;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.util.volume.Volume;
 
@@ -25,9 +26,13 @@ public class StochasticTrainer extends Trainer
     @Override
     protected void updateWeights()
     {
-        for(Layer layer : network.layers)
+        for(int i = 0; i < network.getLayers().size(); i++)
         {
-            final Volume[] weights = layer.getWeights();
+            final LayerParameters parameters = network.getParameters().get(i);
+            final Volume[] weights = network.getLayers().get(i).getWeights();
+
+            if(!parameters.isTrainable())
+                continue;
 
             for(final Volume weightVolume : weights)
             {
