@@ -249,6 +249,18 @@ public class Network
             return this;
         }
 
+        public Builder hookBilinearResample(Dimensions newDimensions)
+        {
+            checkBuilt();
+
+            final BilinearResample layer = new BilinearResample(previous.getOutputDimensions(), newDimensions);
+
+            hiddenLayers.add(layer);
+            previous = layer;
+
+            return this;
+        }
+
         public Network build(Layer.OutputFunctionType outputFunctionType)
         {
             checkBuilt();
