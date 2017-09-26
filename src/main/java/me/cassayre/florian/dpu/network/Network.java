@@ -167,7 +167,8 @@ public class Network
 
             hookActivationFunction(functionType);
 
-            hookUpSample(poolingStride);
+            if(poolingStride != 1)
+                hookUpSample(poolingStride);
 
             return this;
         }
