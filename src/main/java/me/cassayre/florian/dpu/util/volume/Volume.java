@@ -9,12 +9,20 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * A 3-dimensional tensor containing double precision float values as well as their gradients.
+ * Once defined, the size of a volume cannot be modified.
+ */
 public final class Volume
 {
     private final Dimensions dimensions;
     private final double[] values;
     private final double[] gradient;
 
+    /**
+     * Creates a new volume initialized with zeroes (values & gradients) having the specified {@link me.cassayre.florian.dpu.util.volume.Dimensions}.
+     * @param dimensions the dimensions of the volume
+     */
     public Volume(Dimensions dimensions)
     {
         this.dimensions = dimensions;
@@ -30,26 +38,42 @@ public final class Volume
         this.gradient = gradient;
     }
 
+    /**
+     * Returns the dimensions of the volume.
+     * @return the dimensions
+     */
     public Dimensions getDimensions()
     {
         return dimensions;
     }
 
+    /**
+     * @see me.cassayre.florian.dpu.util.volume.Dimensions#getWidth
+     */
     public int getWidth()
     {
         return dimensions.getWidth();
     }
 
+    /**
+     * @see me.cassayre.florian.dpu.util.volume.Dimensions#getHeight
+     */
     public int getHeight()
     {
         return dimensions.getHeight();
     }
 
+    /**
+     * @see me.cassayre.florian.dpu.util.volume.Dimensions#getDepth
+     */
     public int getDepth()
     {
         return dimensions.getDepth();
     }
 
+    /**
+     * @see me.cassayre.florian.dpu.util.volume.Dimensions#getSize
+     */
     public int getSize()
     {
         return dimensions.getSize();
