@@ -1,8 +1,5 @@
 package me.cassayre.florian.dpu.layer;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import me.cassayre.florian.dpu.util.volume.Dimensions;
 import me.cassayre.florian.dpu.util.volume.Volume;
 
@@ -155,49 +152,5 @@ public class DeconvolutionLayer extends Layer
         array[array.length - 1] = biases;
 
         return array;
-    }
-
-    @Override
-    public JsonObject export()
-    {
-        final JsonObject object = new JsonObject();
-        final JsonArray array = new JsonArray();
-
-        for(Volume filter : filters)
-        {
-            final JsonObject f = new JsonObject();
-            final JsonObject w = new JsonObject();
-
-            int i = 0;
-            for(int y = 0; y < filter.getHeight(); y++)
-            {
-                for(int x = 0; x < filter.getWidth(); x++)
-                {
-                    for(int z = 0; z < filter.getDepth(); z++)
-                    {
-                        w.add(i + "", new JsonPrimitive(filter.get(x, y, z)));
-                        i++;
-                    }
-                }
-            }
-
-            f.add("w", w);
-            array.add(f);
-        }
-
-        object.add("filters", array);
-
-        final JsonObject b = new JsonObject();
-        final JsonObject w = new JsonObject();
-
-        for(int i = 0; i < biases.getDepth(); i++)
-        {
-            w.add(i + "", new JsonPrimitive(biases.get(0, 0, i)));
-        }
-
-        b.add("w", w);
-        object.add("biases", b);
-
-        return object;
     }
 }

@@ -1,6 +1,5 @@
 package me.cassayre.florian.dpu.layer;
 
-import com.google.gson.JsonObject;
 import me.cassayre.florian.dpu.util.volume.Dimensions;
 import me.cassayre.florian.dpu.util.Utils;
 import me.cassayre.florian.dpu.util.volume.Volume;
@@ -33,12 +32,6 @@ public abstract class Layer
     public Volume[] getWeights()
     {
         return new Volume[] {};
-    }
-
-    @Deprecated
-    public JsonObject export()
-    {
-        throw new UnsupportedOperationException();
     }
 
     protected void checkSameDimensions(Volume input)
