@@ -12,9 +12,8 @@ import java.util.List;
 public class Network
 {
     private final List<Layer> layers;
-    private final List<LayerParameters> parameters;
 
-    public Network(InputLayer inputLayer, List<Layer> hiddenLayers, OutputLayer outputLayer, List<LayerParameters> parameters)
+    public Network(InputLayer inputLayer, List<Layer> hiddenLayers, OutputLayer outputLayer)
     {
         final List<Layer> layers = new ArrayList<>(hiddenLayers.size() + 2);
 
@@ -34,11 +33,6 @@ public class Network
         }
 
         this.layers = Collections.unmodifiableList(layers);
-
-        if(parameters.size() != layers.size())
-            throw new IllegalArgumentException("Parameters don't match one by one to their corresponding layer");
-
-        this.parameters = Collections.unmodifiableList(new ArrayList<>(parameters));
     }
 
     public void forwardPropagation(Volume input)
@@ -79,11 +73,6 @@ public class Network
         return layers;
     }
 
-    public List<LayerParameters> getParameters()
-    {
-        return parameters;
-    }
-
     @Deprecated
     public void clearGradients()
     {
@@ -104,17 +93,12 @@ public class Network
 
         private Layer previous;
 
-        private final List<LayerParameters> parameters = new ArrayList<>();
-        private boolean isTrainable;
-
         private boolean isBuilt = false;
 
         public Builder(Dimensions inputDimensions)
         {
             inputLayer = new InputLayer(inputDimensions);
             previous = inputLayer;
-
-            setDefaultParameters();
         }
 
         public Builder hookFullyConnected(Volume[] weights, Volume biases, Layer.ActivationFunctionType functionType)
@@ -261,30 +245,10 @@ public class Network
             return this;
         }
 
-        public Builder setTrainable(boolean trainable)
-        {
-            isTrainable = trainable;
-
-            return this;
-        }
-
         public void hookLayer(Layer layer)
         {
             hiddenLayers.add(layer);
             previous = layer;
-
-            pushParameters();
-        }
-
-        private void pushParameters()
-        {
-            parameters.add(new LayerParameters(isTrainable));
-            setDefaultParameters();
-        }
-
-        private void setDefaultParameters()
-        {
-            isTrainable = true;
         }
 
         public Network build(Layer.OutputFunctionType outputFunctionType)
@@ -304,13 +268,9 @@ public class Network
                 throw new UnsupportedOperationException();
             }
 
-            pushParameters();
-
-            pushParameters(); // Output layer
-
             isBuilt = true;
 
-            return new Network(inputLayer, hiddenLayers, outputLayer, parameters);
+            return new Network(inputLayer, hiddenLayers, outputLayer);
         }
 
         private void checkBuilt()

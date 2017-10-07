@@ -7,6 +7,7 @@ import me.cassayre.florian.dpu.util.volume.Volume;
 public abstract class Layer
 {
     protected final Volume volume;
+    private boolean isTrainable = true;
 
     public Layer(Dimensions dimensions)
     {
@@ -32,6 +33,16 @@ public abstract class Layer
     public Volume[] getWeights()
     {
         return new Volume[] {};
+    }
+
+    public boolean isTrainable()
+    {
+        return isTrainable;
+    }
+
+    public void setTrainable(boolean isTrainable)
+    {
+        this.isTrainable = isTrainable;
     }
 
     protected void checkSameDimensions(Volume input)

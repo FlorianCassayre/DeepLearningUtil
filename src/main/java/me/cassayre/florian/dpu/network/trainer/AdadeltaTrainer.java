@@ -1,6 +1,6 @@
 package me.cassayre.florian.dpu.network.trainer;
 
-import me.cassayre.florian.dpu.network.LayerParameters;
+import me.cassayre.florian.dpu.layer.Layer;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.util.volume.Dimensions;
 import me.cassayre.florian.dpu.util.volume.Volume;
@@ -51,11 +51,11 @@ public class AdadeltaTrainer extends Trainer
     {
         for(int i = 0; i < network.getLayers().size(); i++)
         {
-            final LayerParameters parameters = network.getParameters().get(i);
             final int i1 = i;
-            final Volume[] weights = network.getLayers().get(i).getWeights();
+            final Layer layer = network.getLayers().get(i);
+            final Volume[] weights = layer.getWeights();
 
-            if(!parameters.isTrainable())
+            if(!layer.isTrainable())
                 continue;
 
             for(int j = 0; j < weights.length; j++)
