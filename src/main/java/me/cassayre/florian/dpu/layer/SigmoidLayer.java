@@ -19,16 +19,16 @@ public class SigmoidLayer extends Layer
     @Override
     public void forwardPropagation(Volume input)
     {
-        volume.fillValues((x, y, z) -> sigmoid(input.get(x, y, z)));
+        volume.fillValues(i -> sigmoid(input.get(i)));
     }
 
     @Override
     public void backwardPropagation(Volume input)
     {
-        input.fillGradients((x, y, z) ->
+        input.fillGradients(i ->
         {
-            final double v = volume.get(x, y, z);
-            return v * (1 - v) * volume.getGradient(x, y, z);
+            final double v = volume.get(i);
+            return v * (1 - v) * volume.getGradient(i);
         });
     }
 

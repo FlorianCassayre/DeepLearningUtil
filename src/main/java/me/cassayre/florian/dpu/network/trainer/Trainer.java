@@ -49,7 +49,7 @@ public abstract class Trainer
 
             for(Layer layer : network.getLayers())
                 for(final Volume weightVolume : layer.getWeights())
-                    weightVolume.fillGradients((x, y, z) -> 0.0);
+                    weightVolume.fillGradients(i -> 0.0);
         }
     }
 

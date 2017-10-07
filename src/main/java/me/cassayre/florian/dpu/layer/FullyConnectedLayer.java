@@ -33,24 +33,24 @@ public class FullyConnectedLayer extends Layer
 
             volume.set(0, 0, i, bias);
 
-            input.foreach((x, y, z) -> volume.add(0, 0, j, input.get(x, y, z) * multipliers.get(x, y, z)));
+            input.foreach(k -> volume.add(0, 0, j, input.get(k) * multipliers.get(k)));
         }
     }
 
     @Override
     public void backwardPropagation(Volume input)
     {
-        input.fillGradients((x, y, z) -> 0.0);
+        input.fillGradients(k -> 0.0);
 
         for(int i = 0; i < weights.length; i++)
         {
             final Volume multipliers = weights[i];
             final double chain = volume.getGradient(0, 0, i);
 
-            input.foreach((x, y, z) ->
+            input.foreach(k ->
             {
-                input.addGradient(x, y, z, multipliers.get(x, y, z) * chain);
-                multipliers.addGradient(x, y, z, input.get(x, y, z) * chain);
+                input.addGradient(k, multipliers.get(k) * chain);
+                multipliers.addGradient(k, input.get(k) * chain);
             });
 
             biases.addGradient(0, 0, i, chain);

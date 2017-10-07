@@ -63,17 +63,17 @@ public class AdadeltaTrainer extends Trainer
                 final int j1 = j;
                 final Volume weightVolume = weights[j];
 
-                weightVolume.foreach((x, y, z) ->
+                weightVolume.foreach(k ->
                 {
-                    final double grad = weightVolume.getGradient(x, y, z) / batchSize;
+                    final double grad = weightVolume.getGradient(k) / batchSize;
 
                     final Volume gt1 = gt[i1][j1], vt1 = vt[i1][j1], xt1 = xt[i1][j1];
 
-                    gt1.set(x, y, z, gamma * gt1.get(x, y, z) + (1 - gamma) * grad * grad);
-                    vt1.set(x, y, z, -Math.sqrt(xt1.get(x, y, z) + e) * grad / Math.sqrt(gt1.get(x, y, z) + e));
-                    xt1.set(x, y, z, gamma * xt1.get(x, y, z) + (1 - gamma) * vt1.get(x, y, z) * vt1.get(x, y, z));
+                    gt1.set(k, gamma * gt1.get(k) + (1 - gamma) * grad * grad);
+                    vt1.set(k, -Math.sqrt(xt1.get(k) + e) * grad / Math.sqrt(gt1.get(k) + e));
+                    xt1.set(k, gamma * xt1.get(k) + (1 - gamma) * vt1.get(k) * vt1.get(k));
 
-                    weightVolume.add(x, y, z, vt1.get(x, y, z));
+                    weightVolume.add(k, vt1.get(k));
                 });
             }
         }

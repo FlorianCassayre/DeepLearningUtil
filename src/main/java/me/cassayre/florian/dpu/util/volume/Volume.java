@@ -81,7 +81,7 @@ public final class Volume
 
     private int getIndex(int x, int y, int z)
     {
-        return z + (x + (y * dimensions.getWidth())) * dimensions.getDepth();
+        return z + (x + (y * dimensions.getWidth())) * dimensions.getDepth(); // Order of access: z, x, y
     }
 
     public double get(int x, int y, int z)
@@ -146,9 +146,9 @@ public final class Volume
 
     public void foreach(TriConsumer<Integer, Integer, Integer> consumer)
     {
-        for(int x = 0; x < getWidth(); x++)
+        for(int y = 0; y < getHeight(); y++)
         {
-            for(int y = 0; y < getHeight(); y++)
+            for(int x = 0; x < getWidth(); x++)
             {
                 for(int z = 0; z < getDepth(); z++)
                 {

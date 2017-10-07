@@ -26,26 +26,26 @@ public class BilinearResample extends Layer
     @Override
     public void forwardPropagation(Volume input)
     {
-        for(int z = 0; z < volume.getDepth(); z++)
+        for(int y = 0; y < volume.getHeight(); y++)
         {
-            for(int y = 0; y < volume.getHeight(); y++)
+            final double yCurrentScaled = (double) y / (volume.getHeight() - 1);
+            final int ya = (int) Math.floor(yCurrentScaled * (input.getHeight() - 1)), yb = Math.min(ya + 1, input.getHeight() - 1);
+            final double yaScaled = (double) ya / (input.getHeight() - 1);
+            final double dy = 1.0 / (input.getHeight() - 1);
+
+            final double vert = (yCurrentScaled - yaScaled) / dy;
+
+            for(int x = 0; x < volume.getWidth(); x++)
             {
-                final double yCurrentScaled = (double) y / (volume.getHeight() - 1);
-                final int ya = (int) Math.floor(yCurrentScaled * (input.getHeight() - 1)), yb = Math.min(ya + 1, input.getHeight() - 1);
-                final double yaScaled = (double) ya / (input.getHeight() - 1);
-                final double dy = 1.0 / (input.getHeight() - 1);
+                final double xCurrentScaled = (double) x / (volume.getWidth() - 1);
+                final int xa = (int) Math.floor(xCurrentScaled * (input.getWidth() - 1)), xb = Math.min(xa + 1, input.getWidth() - 1);
+                final double xaScaled = (double) xa / (input.getWidth() - 1);
+                final double dx = 1.0 / (input.getWidth() - 1);
 
-                final double vert = (yCurrentScaled - yaScaled) / dy;
+                final double hor = (xCurrentScaled - xaScaled) / dx;
 
-                for(int x = 0; x < volume.getWidth(); x++)
+                for(int z = 0; z < volume.getDepth(); z++)
                 {
-                    final double xCurrentScaled = (double) x / (volume.getWidth() - 1);
-                    final int xa = (int) Math.floor(xCurrentScaled * (input.getWidth() - 1)), xb = Math.min(xa + 1, input.getWidth() - 1);
-                    final double xaScaled = (double) xa / (input.getWidth() - 1);
-                    final double dx = 1.0 / (input.getWidth() - 1);
-
-                    final double hor = (xCurrentScaled - xaScaled) / dx;
-
                     final double vaa = input.get(xa, ya, z), vba = input.get(xb, ya, z);
                     final double v1 = hor * (vba - vaa) + vaa;
 
@@ -65,26 +65,26 @@ public class BilinearResample extends Layer
     {
         input.fillGradients(i -> 0.0);
 
-        for(int z = 0; z < input.getDepth(); z++)
+        for(int y = 0; y < input.getHeight(); y++)
         {
-            for(int y = 0; y < input.getHeight(); y++)
+            final double yCurrentScaled = (double) y / (input.getHeight() - 1);
+            final int ya = (int) Math.floor(yCurrentScaled * (volume.getHeight() - 1)), yb = Math.min(ya + 1, volume.getHeight() - 1);
+            final double yaScaled = (double) ya / (volume.getHeight() - 1);
+            final double dy = 1.0 / (volume.getHeight() - 1);
+
+            final double vert = (yCurrentScaled - yaScaled) / dy;
+
+            for(int x = 0; x < input.getWidth(); x++)
             {
-                final double yCurrentScaled = (double) y / (input.getHeight() - 1);
-                final int ya = (int) Math.floor(yCurrentScaled * (volume.getHeight() - 1)), yb = Math.min(ya + 1, volume.getHeight() - 1);
-                final double yaScaled = (double) ya / (volume.getHeight() - 1);
-                final double dy = 1.0 / (volume.getHeight() - 1);
+                final double xCurrentScaled = (double) x / (input.getWidth() - 1);
+                final int xa = (int) Math.floor(xCurrentScaled * (volume.getWidth() - 1)), xb = Math.min(xa + 1, volume.getWidth() - 1);
+                final double xaScaled = (double) xa / (volume.getWidth() - 1);
+                final double dx = 1.0 / (volume.getWidth() - 1);
 
-                final double vert = (yCurrentScaled - yaScaled) / dy;
+                final double hor = (xCurrentScaled - xaScaled) / dx;
 
-                for(int x = 0; x < input.getWidth(); x++)
+                for(int z = 0; z < input.getDepth(); z++)
                 {
-                    final double xCurrentScaled = (double) x / (input.getWidth() - 1);
-                    final int xa = (int) Math.floor(xCurrentScaled * (volume.getWidth() - 1)), xb = Math.min(xa + 1, volume.getWidth() - 1);
-                    final double xaScaled = (double) xa / (volume.getWidth() - 1);
-                    final double dx = 1.0 / (volume.getWidth() - 1);
-
-                    final double hor = (xCurrentScaled - xaScaled) / dx;
-
                     final double vaa = volume.getGradient(xa, ya, z), vba = volume.getGradient(xb, ya, z);
                     final double v1 = hor * (vba - vaa) + vaa;
 

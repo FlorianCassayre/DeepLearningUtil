@@ -33,23 +33,15 @@ public class MeanSquaresLayer extends OutputLayer
     @Override
     public void backwardPropagationExpected(Volume expected)
     {
-        double sum = 0.0;
+        loss = 0.0;
 
-        for(int x = 0; x < expected.getWidth(); x++)
+        volume.foreach(i ->
         {
-            for(int y = 0; y < expected.getHeight(); y++)
-            {
-                for(int z = 0; z < expected.getDepth(); z++)
-                {
-                    final double v = volume.get(x, y, z) - expected.get(x, y, z);
+            final double v = volume.get(i) - expected.get(i);
 
-                    volume.setGradient(x, y, z, v);
+            volume.setGradient(i, v);
 
-                    sum += v * v;
-                }
-            }
-        }
-
-        loss = sum;
+            loss += v * v;
+        });
     }
 }

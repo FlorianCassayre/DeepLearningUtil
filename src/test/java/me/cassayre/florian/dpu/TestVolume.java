@@ -4,6 +4,8 @@ import me.cassayre.florian.dpu.util.volume.Dimensions;
 import me.cassayre.florian.dpu.util.volume.Volume;
 import org.junit.Test;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
 
 public class TestVolume
@@ -32,5 +34,27 @@ public class TestVolume
         assertEquals(1.0, volume2.get(0), 0.0);
         volume1.set(0, 1.0);
         assertEquals(1.0, volume2.get(0), 0.0);
+    }
+
+    @Test
+    public void testIterationOrder()
+    {
+        final Random random = new Random(0);
+        final Volume volume = new Volume(new Dimensions(2, 3, 4));
+
+        int i = 0;
+        for(int y = 0; y < volume.getHeight(); y++)
+        {
+            for(int x = 0; x < volume.getWidth(); x++)
+            {
+                for(int z = 0; z < volume.getDepth(); z++)
+                {
+                    final double d = random.nextDouble();
+                    volume.set(x, y, z, d);
+                    assertEquals(d, volume.get(i), 0.0);
+                    i++;
+                }
+            }
+        }
     }
 }

@@ -56,31 +56,32 @@ public class ConvolutionLayer extends Layer
     @Override
     public void forwardPropagation(Volume input)
     {
+        final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
+
         for(int i = 0; i < volume.getDepth(); i++)
         {
             final Volume filter = this.filters[i];
             final int sx = (filter.getWidth() >> 1) - paddingX, sy = (filter.getHeight() >> 1) - paddingY;
 
-            for(int x = 0; x < volume.getWidth(); x++)
+            for(int y = 0; y < volume.getHeight(); y++)
             {
-                for(int y = 0; y < volume.getHeight(); y++)
+                for(int x = 0; x < volume.getWidth(); x++)
                 {
                     double sum = biases.get(0, 0, i);
 
-                    final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
-
-                    for(int x1 = -rx; x1 <= rx; x1++)
+                    for(int y1 = -ry; y1 <= ry; y1++)
                     {
-                        for(int y1 = -ry; y1 <= ry; y1++)
+                        final int yf = y * strideY + y1 + sy;
+                        if(!isYBounds(yf))
+                            continue;
+                        for(int x1 = -rx; x1 <= rx; x1++)
                         {
-                            final int xf = x * strideX + x1 + sx, yf = y * strideY + y1 + sy;
-
-                            if(isInBounds(xf, yf))
+                            final int xf = x * strideX + x1 + sx;
+                            if(!isXBounds(xf))
+                                continue;
+                            for(int j = 0; j < filter.getDepth(); j++)
                             {
-                                for(int j = 0; j < filter.getDepth(); j++)
-                                {
-                                    sum += input.get(xf, yf, j) * filter.get(x1 + rx, y1 + rx, j);
-                                }
+                                sum += input.get(xf, yf, j) * filter.get(x1 + rx, y1 + rx, j);
                             }
                         }
                     }
@@ -94,34 +95,35 @@ public class ConvolutionLayer extends Layer
     @Override
     public void backwardPropagation(Volume input)
     {
-        input.fillGradients((x, y, z) -> 0.0);
+        input.fillGradients(i -> 0.0);
+
+        final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
 
         for(int i = 0; i < volume.getDepth(); i++)
         {
             final Volume filter = filters[i];
             final int sx = (filter.getWidth() >> 1) - paddingX, sy = (filter.getHeight() >> 1) - paddingY;
 
-            for(int x = 0; x < volume.getWidth(); x++)
+            for(int y = 0; y < volume.getHeight(); y++)
             {
-                for(int y = 0; y < volume.getHeight(); y++)
+                for(int x = 0; x < volume.getWidth(); x++)
                 {
                     final double chain = volume.getGradient(x, y, i);
 
-                    final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
-
-                    for(int x1 = -rx; x1 <= rx; x1++)
+                    for(int y1 = -ry; y1 <= ry; y1++)
                     {
-                        for(int y1 = -ry; y1 <= ry; y1++)
+                        final int yf = y * strideY + y1 + sy;
+                        if(!isYBounds(yf))
+                            continue;
+                        for(int x1 = -rx; x1 <= rx; x1++)
                         {
-                            final int xf = x * strideX + x1 + sx, yf = y * strideY + y1 + sy;
-
-                            if(isInBounds(xf, yf))
+                            final int xf = x * strideX + x1 + sx;
+                            if(!isXBounds(xf))
+                                continue;
+                            for(int j = 0; j < filter.getDepth(); j++)
                             {
-                                for(int j = 0; j < filter.getDepth(); j++)
-                                {
-                                    filter.addGradient(x1 + rx, y1 + ry, j, input.get(xf, yf, j) * chain);
-                                    input.addGradient(xf, yf, j, filter.get(x1 + rx, y1 + ry, j) * chain);
-                                }
+                                filter.addGradient(x1 + rx, y1 + ry, j, input.get(xf, yf, j) * chain);
+                                input.addGradient(xf, yf, j, filter.get(x1 + rx, y1 + ry, j) * chain);
                             }
                         }
                     }
@@ -132,9 +134,14 @@ public class ConvolutionLayer extends Layer
         }
     }
 
-    private boolean isInBounds(int x, int y)
+    private boolean isXBounds(int x)
     {
-        return x >= 0 && y >= 0 && x < inputDimensions.getWidth() && y < inputDimensions.getHeight();
+        return x >= 0 && x < inputDimensions.getWidth();
+    }
+
+    private boolean isYBounds(int y)
+    {
+        return y >= 0 && y < inputDimensions.getHeight();
     }
 
     @Override

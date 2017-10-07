@@ -16,7 +16,7 @@ public final class Utils
     public static Volume randomWeightsVolume(Dimensions dimensions)
     {
         final Volume volume = new Volume(dimensions);
-        volume.fillValues((x, y, z) -> (Math.random() - 0.5));
+        volume.fillValues(i -> (Math.random() - 0.5));
         return volume;
     }
 

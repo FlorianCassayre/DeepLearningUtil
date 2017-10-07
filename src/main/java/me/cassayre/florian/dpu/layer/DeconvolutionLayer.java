@@ -55,38 +55,41 @@ public class DeconvolutionLayer extends Layer
     {
         volume.fillValues((i) -> 0.0);
 
+        final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
+
         for(int i = 0; i < volume.getDepth(); i++)
         {
             final Volume filter = this.filters[i];
 
-            for(int x = 0; x < input.getWidth(); x++)
+            for(int y = 0; y < input.getHeight(); y++)
             {
-                for(int y = 0; y < input.getHeight(); y++)
+                final int cy = y * strideY + paddingY; // Center output
+                for(int x = 0; x < input.getWidth(); x++)
                 {
-                    final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
-                    final int cx = x * strideX + paddingX, cy = y * strideY + paddingY; // Center output
+                    final int cx = x * strideX + paddingX;
 
-                    for(int x1 = -rx; x1 <= rx; x1++)
+                    for(int y1 = -ry; y1 <= ry; y1++)
                     {
-                        for(int y1 = -ry; y1 <= ry; y1++)
+                        final int yf = cy + y1;
+                        if(!isYInBounds(yf))
+                            continue;
+                        for(int x1 = -rx; x1 <= rx; x1++)
                         {
-                            final int xf = cx + x1, yf = cy + y1;
-
-                            if(isInBounds(xf, yf))
+                            final int xf = cx + x1;
+                            if(!isXInBounds(xf))
+                                continue;
+                            for(int j = 0; j < filter.getDepth(); j++)
                             {
-                                for(int j = 0; j < filter.getDepth(); j++)
-                                {
-                                    volume.add(xf, yf, i, input.get(x, y, j) * filter.get(rx + x1, ry + y1, j));
-                                }
+                                volume.add(xf, yf, i, input.get(x, y, j) * filter.get(rx + x1, ry + y1, j));
                             }
                         }
                     }
                 }
             }
 
-            for(int x = 0; x < volume.getWidth(); x++)
+            for(int y = 0; y < volume.getHeight(); y++)
             {
-                for(int y = 0; y < volume.getHeight(); y++)
+                for(int x = 0; x < volume.getWidth(); x++)
                 {
                     volume.add(x, y, i, biases.get(i));
                 }
@@ -97,41 +100,45 @@ public class DeconvolutionLayer extends Layer
     @Override
     public void backwardPropagation(Volume input)
     {
-        input.fillGradients((x, y, z) -> 0.0);
+        input.fillGradients(i -> 0.0);
+
+        final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
 
         for(int i = 0; i < volume.getDepth(); i++)
         {
             final Volume filter = this.filters[i];
 
-            for(int x = 0; x < input.getWidth(); x++)
+            for(int y = 0; y < input.getHeight(); y++)
             {
-                for(int y = 0; y < input.getHeight(); y++)
+                final int cy = y * strideY + paddingY; // Center output
+                for(int x = 0; x < input.getWidth(); x++)
                 {
-                    final int rx = (filters[0].getWidth() - 1) >> 1, ry = (filters[0].getHeight() - 1) >> 1;
-                    final int cx = x * strideX + paddingX, cy = y * strideY + paddingY; // Center output
+                    final int cx = x * strideX + paddingX;
 
-                    for(int x1 = -rx; x1 <= rx; x1++)
+                    for(int y1 = -ry; y1 <= ry; y1++)
                     {
-                        for(int y1 = -ry; y1 <= ry; y1++)
+                        final int yf = cy + y1;
+                        if(!isYInBounds(yf))
+                            continue;
+                        for(int x1 = -rx; x1 <= rx; x1++)
                         {
-                            final int xf = cx + x1, yf = cy + y1;
+                            final int xf = cx + x1;
+                            if(!isXInBounds(xf))
+                                continue;
 
-                            if(isInBounds(xf, yf))
+                            for(int j = 0; j < filter.getDepth(); j++)
                             {
-                                for(int j = 0; j < filter.getDepth(); j++)
-                                {
-                                    filter.addGradient(rx + x1, ry + y1, j, volume.getGradient(xf, yf, i) * input.get(x, y, j));
-                                    input.addGradient(x, y, j, volume.getGradient(xf, yf, i) * filter.get(rx + x1, ry + y1, j));
-                                }
+                                filter.addGradient(rx + x1, ry + y1, j, volume.getGradient(xf, yf, i) * input.get(x, y, j));
+                                input.addGradient(x, y, j, volume.getGradient(xf, yf, i) * filter.get(rx + x1, ry + y1, j));
                             }
                         }
                     }
                 }
             }
 
-            for(int x = 0; x < volume.getWidth(); x++)
+            for(int y = 0; y < volume.getHeight(); y++)
             {
-                for(int y = 0; y < volume.getHeight(); y++)
+                for(int x = 0; x < volume.getWidth(); x++)
                 {
                     biases.addGradient(i, volume.getGradient(x, y, i));
                 }
@@ -139,9 +146,14 @@ public class DeconvolutionLayer extends Layer
         }
     }
 
-    private boolean isInBounds(int x, int y)
+    private boolean isXInBounds(int x)
     {
-        return x >= 0 && y >= 0 && x < volume.getWidth() && y < volume.getHeight();
+        return x >= 0 && x < volume.getWidth();
+    }
+
+    private boolean isYInBounds(int y)
+    {
+        return y >= 0 && y < volume.getHeight();
     }
 
     @Override

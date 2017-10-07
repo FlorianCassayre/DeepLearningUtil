@@ -1,6 +1,5 @@
 package me.cassayre.florian.dpu.network.trainer;
 
-import me.cassayre.florian.dpu.layer.Layer;
 import me.cassayre.florian.dpu.network.LayerParameters;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.util.volume.Volume;
@@ -36,7 +35,7 @@ public class StochasticTrainer extends Trainer
 
             for(final Volume weightVolume : weights)
             {
-                weightVolume.fillValues((x, y, z) -> weightVolume.get(x, y, z) - learningRate * weightVolume.getGradient(x, y, z) / batchSize);
+                weightVolume.fillValues(k -> weightVolume.get(k) - learningRate * weightVolume.getGradient(k) / batchSize);
             }
         }
     }

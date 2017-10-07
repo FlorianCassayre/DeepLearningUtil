@@ -19,13 +19,13 @@ public class TanhLayer extends Layer
     @Override
     public void forwardPropagation(Volume input)
     {
-        volume.fillValues((x, y, z) -> Math.tanh(input.get(x, y, z)));
+        volume.fillValues(i -> Math.tanh(input.get(i)));
     }
 
     @Override
     public void backwardPropagation(Volume input)
     {
-        input.fillGradients((x, y, z) -> 1 - square(volume.get(x, y, z)));
+        input.fillGradients(i -> 1 - square(volume.get(i)));
     }
 
     private double square(double x)

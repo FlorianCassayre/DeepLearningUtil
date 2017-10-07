@@ -19,12 +19,12 @@ public class ReLULayer extends Layer
     @Override
     public void forwardPropagation(Volume input)
     {
-        volume.fillValues((x, y, z) -> Math.max(input.get(x, y, z), 0.0));
+        volume.fillValues(i -> Math.max(input.get(i), 0.0));
     }
 
     @Override
     public void backwardPropagation(Volume input)
     {
-        input.fillGradients((x, y, z) -> input.get(x, y, z) > 0.0 ? volume.getGradient(x, y, z) : 0.0);
+        input.fillGradients(i -> input.get(i) > 0.0 ? volume.getGradient(i) : 0.0);
     }
 }

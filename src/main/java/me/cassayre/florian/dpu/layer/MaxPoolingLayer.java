@@ -26,52 +26,40 @@ public class MaxPoolingLayer extends Layer
     @Override
     public void forwardPropagation(Volume input)
     {
-        for(int x = 0; x < volume.getWidth(); x++)
+        volume.foreach((x, y, z) ->
         {
-            for(int y = 0; y < volume.getHeight(); y++)
+            double max = Double.NEGATIVE_INFINITY;
+
+            for(int y1 = 0; y1 < stride; y1++)
             {
-                for(int z = 0; z < volume.getDepth(); z++)
+                for(int x1 = 0; x1 < stride; x1++)
                 {
-                    double max = Double.NEGATIVE_INFINITY;
-
-                    for(int x1 = 0; x1 < stride; x1++)
-                    {
-                        for(int y1 = 0; y1 < stride; y1++)
-                        {
-                            max = Math.max(input.get(x * stride + x1, y * stride + y1, z), max);
-                        }
-                    }
-
-                    volume.set(x, y, z, max);
+                    max = Math.max(input.get(x * stride + x1, y * stride + y1, z), max);
                 }
             }
-        }
+
+            volume.set(x, y, z, max);
+        });
     }
 
     @Override
     public void backwardPropagation(Volume input)
     {
-        for(int x = 0; x < volume.getWidth(); x++)
+        volume.foreach((x, y, z) ->
         {
-            for(int y = 0; y < volume.getHeight(); y++)
+            final double chain = volume.getGradient(x, y, z);
+
+            final double max = volume.get(x, y, z);
+
+            for(int y1 = 0; y1 < stride; y1++)
             {
-                for(int z = 0; z < volume.getDepth(); z++)
+                for(int x1 = 0; x1 < stride; x1++)
                 {
-                    final double chain = volume.getGradient(x, y, z);
+                    final int rx = x * stride + x1, ry = y * stride + y1;
 
-                    final double max = volume.get(x, y, z);
-
-                    for(int x1 = 0; x1 < stride; x1++)
-                    {
-                        for(int y1 = 0; y1 < stride; y1++)
-                        {
-                            final int rx = x * stride + x1, ry = y * stride + y1;
-
-                            input.setGradient(rx, ry, z, input.get(rx, ry, z) == max ? chain : 0.0);
-                        }
-                    }
+                    input.setGradient(rx, ry, z, input.get(rx, ry, z) == max ? chain : 0.0);
                 }
             }
-        }
+        });
     }
 }

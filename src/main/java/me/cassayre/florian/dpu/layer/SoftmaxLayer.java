@@ -7,6 +7,8 @@ import java.util.function.Function;
 
 public class SoftmaxLayer extends OutputLayer
 {
+    private double max, sum;
+
     private static final double LN_2 = Math.log(2);
 
     public SoftmaxLayer(Dimensions dimensions)
@@ -23,42 +25,24 @@ public class SoftmaxLayer extends OutputLayer
     @Override
     public void forwardPropagation(Volume input)
     {
-        double max = Double.NEGATIVE_INFINITY;
-        for(int x = 0; x < input.getWidth(); x++)
+        max = Double.NEGATIVE_INFINITY;
+        input.foreach(i ->
         {
-            for(int y = 0; y < input.getHeight(); y++)
-            {
-                for(int z = 0; z < input.getDepth(); z++)
-                {
-                    final double d = input.get(x, y, z);
-                    max = Math.max(d, max);
-                }
-            }
-        }
+            final double d = input.get(i);
+            max = Math.max(d, max);
+        });
 
-        double sum = 0.0;
-        for(int x = 0; x < input.getWidth(); x++)
+        sum = 0.0;
+        input.foreach(i ->
         {
-            for(int y = 0; y < input.getHeight(); y++)
-            {
-                for(int z = 0; z < input.getDepth(); z++)
-                {
-                    final double d = input.get(x, y, z);
-                    sum += Math.exp(d - max);
-                }
-            }
-        }
+            final double d = input.get(i);
+            sum += Math.exp(d - max);
+        });
 
-        for(int x = 0; x < input.getWidth(); x++)
+        input.foreach(i ->
         {
-            for(int y = 0; y < input.getHeight(); y++)
-            {
-                for(int z = 0; z < input.getDepth(); z++)
-                {
-                    volume.set(x, y, z, Math.exp(input.get(x, y, z) - max) / sum);
-                }
-            }
-        }
+            volume.set(i, Math.exp(input.get(i) - max) / sum);
+        });
     }
 
     @Override
@@ -70,27 +54,19 @@ public class SoftmaxLayer extends OutputLayer
     @Override
     public void backwardPropagationExpected(Volume expected)
     {
-        double sum = 0.0;
+        loss = 0.0;
 
-        for(int x = 0; x < expected.getWidth(); x++)
+        expected.foreach(i ->
         {
-            for(int y = 0; y < expected.getHeight(); y++)
-            {
-                for(int z = 0; z < expected.getDepth(); z++)
-                {
-                    volume.setGradient(x, y, z, (volume.get(x, y, z) - expected.get(x, y, z)));
+            volume.setGradient(i, (volume.get(i) - expected.get(i)));
 
-                    final double exp = expected.get(x, y, z);
-                    final double actual = volume.get(x, y, z);
+            final double exp = expected.get(i);
+            final double actual = volume.get(i);
 
-                    final double l = exp * log2(actual);
+            final double l = exp * log2(actual);
 
-                    sum -= l;
-                }
-            }
-        }
-
-        loss = sum;
+            loss -= l;
+        });
     }
 
     private double log2(double x)

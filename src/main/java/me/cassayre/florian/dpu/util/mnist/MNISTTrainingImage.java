@@ -57,9 +57,9 @@ public final class MNISTTrainingImage
     {
         final byte[] array = new byte[LENGTH];
 
-        for(int x = 0; x < SIZE; x++)
+        for(int y = 0; y < SIZE; y++)
         {
-            for(int y = 0; y < SIZE; y++)
+            for(int x = 0; x < SIZE; x++)
             {
                 final byte b = isInBound(x + rx, y + ry) ? data[x + rx + (y + ry) * SIZE] : 0;
 
