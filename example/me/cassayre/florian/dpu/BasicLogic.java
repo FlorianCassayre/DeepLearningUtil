@@ -1,6 +1,7 @@
 package me.cassayre.florian.dpu;
 
 import me.cassayre.florian.dpu.layer.Layer;
+import me.cassayre.florian.dpu.network.architecture.FeedForwardNetwork;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.network.trainer.AdadeltaTrainer;
 import me.cassayre.florian.dpu.network.trainer.Trainer;
@@ -23,7 +24,7 @@ public class BasicLogic
 
     public static void main(String[] args)
     {
-        final Network network = new Network.Builder(new Dimensions(2))
+        final Network network = new FeedForwardNetwork.Builder(new Dimensions(2))
                 .fullyConnected(new Dimensions(HIDDEN_UNITS), Layer.ActivationFunctionType.SIGMOID)
                 .fullyConnected(new Dimensions(1), Layer.ActivationFunctionType.SIGMOID)
                 .build(Layer.OutputFunctionType.MEAN_SQUARES);

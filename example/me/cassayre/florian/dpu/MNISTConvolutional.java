@@ -1,6 +1,7 @@
 package me.cassayre.florian.dpu;
 
 import me.cassayre.florian.dpu.layer.Layer;
+import me.cassayre.florian.dpu.network.architecture.FeedForwardNetwork;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.network.trainer.AdadeltaTrainer;
 import me.cassayre.florian.dpu.network.trainer.Trainer;
@@ -24,14 +25,13 @@ public class MNISTConvolutional
          */
 
         // Network described here: http://cs.stanford.edu/people/karpathy/convnetjs/demo/mnist.html
-        final Network network = new Network.Builder(new Dimensions(24, 24, 1))
+        final Network network = new FeedForwardNetwork.Builder(new Dimensions(24, 24, 1))
                 .convolution(new Dimensions(5, 5, 8), 2, Layer.ActivationFunctionType.RELU)
                 .convolution(new Dimensions(5, 5, 16), 3, Layer.ActivationFunctionType.RELU)
                 .fullyConnected(new Dimensions(10), Layer.ActivationFunctionType.LINEAR)
                 .build(Layer.OutputFunctionType.SOFTMAX);
 
         // Mini-batch size: 1
-        // Learning rate: 0.001
         final Trainer trainer = new AdadeltaTrainer(network, 0.95, 1E-6);
 
         final List<MNISTTrainingImage> images = MNISTReader.readTrainingImages();

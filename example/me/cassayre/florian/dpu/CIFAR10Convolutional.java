@@ -1,6 +1,7 @@
 package me.cassayre.florian.dpu;
 
 import me.cassayre.florian.dpu.layer.Layer;
+import me.cassayre.florian.dpu.network.architecture.FeedForwardNetwork;
 import me.cassayre.florian.dpu.network.Network;
 import me.cassayre.florian.dpu.network.trainer.AdadeltaTrainer;
 import me.cassayre.florian.dpu.network.trainer.Trainer;
@@ -24,7 +25,7 @@ public class CIFAR10Convolutional
          */
 
         // Network described here: http://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html
-        final Network network = new Network.Builder(new Dimensions(32, 32, 3)) // 32x32x3
+        final Network network = new FeedForwardNetwork.Builder(new Dimensions(32, 32, 3)) // 32x32x3
                 .convolution(new Dimensions(5, 5, 16), 2, Layer.ActivationFunctionType.RELU) // 16x16x16
                 .convolution(new Dimensions(5, 5, 20), 2, Layer.ActivationFunctionType.RELU) // 8x8x24
                 .convolution(new Dimensions(5, 5, 20), 2, Layer.ActivationFunctionType.RELU) // 4x4x32
@@ -32,8 +33,7 @@ public class CIFAR10Convolutional
                 .build(Layer.OutputFunctionType.SOFTMAX);
 
         // Mini-batch size: 1
-        // Learning rate: 0.0001
-        final Trainer trainer = new AdadeltaTrainer(network, 1, 0.0001);
+        final Trainer trainer = new AdadeltaTrainer(network, 0.95, 1E-6);
 
         final List<CIFAR10TrainingImage> trainingSet = CIFARReader.readAllBatches();
         final List<CIFAR10TrainingImage> testingSet = CIFARReader.readTestBatch();
