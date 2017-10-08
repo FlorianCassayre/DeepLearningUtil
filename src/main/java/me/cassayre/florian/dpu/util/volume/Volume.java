@@ -31,6 +31,35 @@ public final class Volume
         this.gradient = new double[dimensions.getSize()];
     }
 
+    /**
+     * Creates a new volume initialized with the provided values and having the specified {@link me.cassayre.florian.dpu.util.volume.Dimensions}.
+     * @param dimensions the dimensions of the volume
+     * @param values the initial values in the following format: <code>[z][y][x]</code>
+     */
+    public Volume(Dimensions dimensions, double... values)
+    {
+        this.dimensions = dimensions;
+
+        if(values.length != dimensions.getSize())
+            throw new IllegalArgumentException("The number of values must match the dimensions");
+
+        this.values = new double[dimensions.getSize()];
+        int i = 0;
+        for(int z = 0; z < getDepth(); z++)
+        {
+            for(int y = 0; y < getHeight(); y++)
+            {
+                for(int x = 0; x < getWidth(); x++)
+                {
+                    set(x, y, z, values[i]);
+                    i++;
+                }
+            }
+        }
+
+        this.gradient = new double[dimensions.getSize()];
+    }
+
     private Volume(Dimensions dimensions, double[] values, double[] gradient)
     {
         this.dimensions = dimensions;

@@ -57,4 +57,26 @@ public class TestVolume
             }
         }
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIllegalValueInitializationSize1()
+    {
+        new Volume(new Dimensions(2, 3, 4), 0.0, 1.0, 2.0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIllegalValueInitializationSize2()
+    {
+        new Volume(new Dimensions(2), 0.0, 1.0, 2.0);
+    }
+
+    @Test
+    public void testCorrectValueInitializationSize()
+    {
+        final Volume volume = new Volume(new Dimensions(2, 2, 2), 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0);
+        assertEquals(0.0, volume.get(0, 0, 0), 0.0);
+        assertEquals(1.0, volume.get(1, 0, 0), 0.0);
+        assertEquals(2.0, volume.get(0, 1, 0), 0.0);
+        assertEquals(4.0, volume.get(0, 0, 1), 0.0);
+    }
 }
