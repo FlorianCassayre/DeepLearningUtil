@@ -25,9 +25,9 @@ public class MNISTConvolutional
 
         // Network described here: http://cs.stanford.edu/people/karpathy/convnetjs/demo/mnist.html
         final Network network = new Network.Builder(new Dimensions(24, 24, 1))
-                .hookConvolutionLayer(new Dimensions(5, 5, 8), 2, Layer.ActivationFunctionType.RELU)
-                .hookConvolutionLayer(new Dimensions(5, 5, 16), 3, Layer.ActivationFunctionType.RELU)
-                .hookFullyConnected(new Dimensions(10), Layer.ActivationFunctionType.LINEAR)
+                .convolution(new Dimensions(5, 5, 8), 2, Layer.ActivationFunctionType.RELU)
+                .convolution(new Dimensions(5, 5, 16), 3, Layer.ActivationFunctionType.RELU)
+                .fullyConnected(new Dimensions(10), Layer.ActivationFunctionType.LINEAR)
                 .build(Layer.OutputFunctionType.SOFTMAX);
 
         // Mini-batch size: 1

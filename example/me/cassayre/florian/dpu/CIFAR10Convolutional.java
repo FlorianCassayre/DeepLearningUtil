@@ -25,10 +25,10 @@ public class CIFAR10Convolutional
 
         // Network described here: http://cs.stanford.edu/people/karpathy/convnetjs/demo/cifar10.html
         final Network network = new Network.Builder(new Dimensions(32, 32, 3)) // 32x32x3
-                .hookConvolutionLayer(new Dimensions(5, 5, 16), 2, Layer.ActivationFunctionType.RELU) // 16x16x16
-                .hookConvolutionLayer(new Dimensions(5, 5, 20), 2, Layer.ActivationFunctionType.RELU) // 8x8x24
-                .hookConvolutionLayer(new Dimensions(5, 5, 20), 2, Layer.ActivationFunctionType.RELU) // 4x4x32
-                .hookFullyConnected(new Dimensions(10), Layer.ActivationFunctionType.LINEAR)
+                .convolution(new Dimensions(5, 5, 16), 2, Layer.ActivationFunctionType.RELU) // 16x16x16
+                .convolution(new Dimensions(5, 5, 20), 2, Layer.ActivationFunctionType.RELU) // 8x8x24
+                .convolution(new Dimensions(5, 5, 20), 2, Layer.ActivationFunctionType.RELU) // 4x4x32
+                .fullyConnected(new Dimensions(10), Layer.ActivationFunctionType.LINEAR)
                 .build(Layer.OutputFunctionType.SOFTMAX);
 
         // Mini-batch size: 1

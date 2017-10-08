@@ -24,8 +24,8 @@ public class BasicLogic
     public static void main(String[] args)
     {
         final Network network = new Network.Builder(new Dimensions(2))
-                .hookFullyConnected(new Dimensions(HIDDEN_UNITS), Layer.ActivationFunctionType.SIGMOID)
-                .hookFullyConnected(new Dimensions(1), Layer.ActivationFunctionType.SIGMOID)
+                .fullyConnected(new Dimensions(HIDDEN_UNITS), Layer.ActivationFunctionType.SIGMOID)
+                .fullyConnected(new Dimensions(1), Layer.ActivationFunctionType.SIGMOID)
                 .build(Layer.OutputFunctionType.MEAN_SQUARES);
         // Test it with a different layer configuration and/or other activation functions
 
