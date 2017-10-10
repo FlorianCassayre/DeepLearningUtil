@@ -5,7 +5,7 @@ import me.cassayre.florian.dpu.util.volume.Volume;
 
 public class MaxPoolingLayer extends Layer
 {
-    protected final int stride;
+    private final int stride;
 
     public MaxPoolingLayer(Dimensions inputDimensions, int stride)
     {

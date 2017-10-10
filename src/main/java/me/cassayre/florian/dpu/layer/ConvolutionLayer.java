@@ -5,11 +5,11 @@ import me.cassayre.florian.dpu.util.volume.Volume;
 
 public class ConvolutionLayer extends Layer
 {
-    protected final Volume[] filters;
-    protected final Volume biases;
-    protected final Dimensions inputDimensions;
-    protected final int strideX, strideY;
-    protected final int paddingX, paddingY;
+    private final Volume[] filters;
+    private final Volume biases;
+    private final Dimensions inputDimensions;
+    private final int strideX, strideY;
+    private final int paddingX, paddingY;
 
     public ConvolutionLayer(Dimensions imageDimensions, Volume[] filters, Volume biases, int strideX, int strideY, int paddingX, int paddingY) // filter: (width, height, previous_depth)[next_depth]
     {

@@ -5,8 +5,8 @@ import me.cassayre.florian.dpu.util.volume.Volume;
 
 public class FullyConnectedLayer extends Layer
 {
-    protected final Volume[] weights;
-    protected final Volume biases;
+    private final Volume[] weights;
+    private final Volume biases;
 
     public FullyConnectedLayer(Volume[] weights, Volume biases)
     {
