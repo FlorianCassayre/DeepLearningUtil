@@ -11,6 +11,9 @@ public class ReshapeLayer extends Layer
     {
         super(outputDimensions);
 
+        if(inputDimensions.getSize() != outputDimensions.getSize())
+            throw new IllegalArgumentException("Sizes must the same");
+
         this.inputDimensions = inputDimensions;
     }
 

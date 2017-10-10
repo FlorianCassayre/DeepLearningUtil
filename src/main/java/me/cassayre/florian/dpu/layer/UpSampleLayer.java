@@ -12,6 +12,9 @@ public class UpSampleLayer extends Layer
     {
         super(new Dimensions(inputDimensions.getWidth() * stride, inputDimensions.getHeight() * stride, inputDimensions.getDepth()));
 
+        if(stride < 0)
+            throw new IllegalArgumentException("Stride can't be negative");
+
         this.inputDimensions = inputDimensions;
         this.stride = stride;
         this.strideSq = stride * stride;

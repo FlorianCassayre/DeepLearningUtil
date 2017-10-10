@@ -15,6 +15,9 @@ public class ConvolutionLayer extends Layer
     {
         super(new Dimensions((imageDimensions.getWidth() - filters[0].getWidth() + 2 * paddingX) / strideX + 1, (imageDimensions.getHeight() - filters[0].getHeight() + 2 * paddingY) / strideY + 1, filters.length));
 
+        if(filters.length != biases.getDepth())
+            throw new IllegalArgumentException("Biases must match the weights");
+
         for(int i = 1; i < filters.length; i++)
             if(!filters[i].getDimensions().equals(filters[0].getDimensions()))
                 throw new IllegalArgumentException("Filter weights must have the same dimensions");

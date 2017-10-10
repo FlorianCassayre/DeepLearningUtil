@@ -3,6 +3,7 @@ package me.cassayre.florian.dpu.layer;
 import me.cassayre.florian.dpu.util.volume.Dimensions;
 import me.cassayre.florian.dpu.util.volume.Volume;
 
+@Deprecated
 public class PaddingLayer extends Layer
 {
     private final Dimensions inputDimensions;

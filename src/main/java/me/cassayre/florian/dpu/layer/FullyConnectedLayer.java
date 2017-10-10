@@ -12,6 +12,9 @@ public class FullyConnectedLayer extends Layer
     {
         super(new Dimensions(weights.length));
 
+        if(weights.length != biases.getDepth())
+            throw new IllegalArgumentException("Biases must match the weights");
+
         this.weights = weights;
         this.biases = biases;
     }

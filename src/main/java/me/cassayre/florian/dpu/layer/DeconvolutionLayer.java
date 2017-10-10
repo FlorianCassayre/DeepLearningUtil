@@ -15,6 +15,9 @@ public class DeconvolutionLayer extends Layer
     {
         super(new Dimensions(strideX * (imageDimensions.getWidth() - 1) + 1 + 2 * paddingX, strideY * (imageDimensions.getHeight() - 1) + 1 + 2 * paddingY, filters.length));
 
+        if(filters.length != biases.getDepth())
+            throw new IllegalArgumentException("Biases must match the weights");
+
         for(int i = 1; i < filters.length; i++)
             if(!filters[i].getDimensions().equals(filters[0].getDimensions()))
                 throw new IllegalArgumentException("Filter weights must have the same dimensions");
