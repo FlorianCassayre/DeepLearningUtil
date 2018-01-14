@@ -3,6 +3,7 @@ package me.cassayre.florian.dpu.util.volume;
 import me.cassayre.florian.dpu.util.TriConsumer;
 import me.cassayre.florian.dpu.util.TriFunction;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -13,7 +14,7 @@ import java.util.function.Function;
  * A 3-dimensional tensor containing double precision float values as well as their gradients.
  * Once defined, the size of a volume cannot be modified.
  */
-public final class Volume
+public final class Volume implements Serializable
 {
     private final Dimensions dimensions;
     private final double[] values;
