@@ -1,11 +1,12 @@
 package me.cassayre.florian.dpu.util.volume;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * An immutable class representing the dimensions of a {@link me.cassayre.florian.dpu.util.volume.Volume}.
  */
-public final class Dimensions
+public final class Dimensions implements Serializable
 {
     private final int width, height, depth;
 

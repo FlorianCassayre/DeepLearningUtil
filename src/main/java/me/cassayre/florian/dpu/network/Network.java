@@ -3,9 +3,10 @@ package me.cassayre.florian.dpu.network;
 import me.cassayre.florian.dpu.layer.Layer;
 import me.cassayre.florian.dpu.util.volume.Volume;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class Network
+public abstract class Network implements Serializable
 {
     public abstract void forwardPropagation(Volume input);
 

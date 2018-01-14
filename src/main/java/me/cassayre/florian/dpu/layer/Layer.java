@@ -1,10 +1,13 @@
 package me.cassayre.florian.dpu.layer;
 
 import me.cassayre.florian.dpu.util.volume.Dimensions;
+
+import java.io.Serializable;
+
 import me.cassayre.florian.dpu.util.Utils;
 import me.cassayre.florian.dpu.util.volume.Volume;
 
-public abstract class Layer
+public abstract class Layer implements Serializable
 {
     protected final Volume volume;
     private boolean isTrainable = true;
